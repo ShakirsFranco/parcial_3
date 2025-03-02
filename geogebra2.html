@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Integración con GeoGebra</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://www.geogebra.org/apps/deployggb.js"></script>
+</head>
+<body class="bg-gray-100 p-6">
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+  <h1 class="text-2xl font-bold mb-4">Integración con GeoGebra</h1>
+  <form id="areaForm" class="space-y-4">
+    <div>
+      <label for="funcF" class="block text-sm font-medium text-gray-700">Función f(x):</label>
+      <input type="text" id="funcF" placeholder="Ej: (2 - x)^2" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+    </div>
+    <div>
+      <label for="funcG" class="block text-sm font-medium text-gray-700">Función g(x):</label>
+      <input type="text" id="funcG" placeholder="Ej: x" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+    </div>
+    <div>
+      <label for="a" class="block text-sm font-medium text-gray-700">Límite inferior (a):</label>
+      <input type="number" id="a" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+    </div>
+    <div>
+      <label for="b" class="block text-sm font-medium text-gray-700">Límite superior (b):</label>
+      <input type="number" id="b" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+    </div>
+    <button type="button" onclick="integrarGeoGebra()" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Integrar con GeoGebra</button>
+  </form>
+  <h2 class="text-xl font-semibold mt-6">Resultado:</h2>
+  <div id="resultado" class="mt-4 text-indigo-600"></div>
+  <div id="geogebra-container" class="mt-4">
+    <div id="ggbApplet" style="width: 600px; height: 600px;"></div>
+  </div>
+</div>
+<script>
+  function integrarGeoGebra() {
+    const funcF = document.getElementById('funcF').value;
+    const funcG = document.getElementById('funcG').value;
+    const a = parseFloat(document.getElementById('a').value);
+    const b = parseFloat(document.getElementById('b').value);
+
+    // Convertir las funciones a un formato que GeoGebra entienda
+    const funcFGeoGebra = funcF.replace(/Math\.pow\(([^,]+),\s*2\)/g, "($1)^2");
+    const funcGGeoGebra = funcG.replace(/Math\.pow\(([^,]+),\s*2\)/g, "($1)^2");
+
+    const parameters = {
+      "appName": "classic",
+      "width": 725,
+      "height": 600,
+      "showToolBar": false,
+      "showAlgebraInput": false,
+      "showMenuBar": false,
+      "appletOnLoad": function(api) {
+        api.evalCommand(`f(x) = ${funcFGeoGebra}`);
+        api.evalCommand(`g(x) = ${funcGGeoGebra}`);
+
+        // Calcular el área entre las curvas usando la función IntegralEntre
+        const area = api.evalCommand(`Integral(f, g, ${a}, ${b})`);
+        document.getElementById('resultado').innerText = `Área entre las curvas: ${area}`;
+      }
+    };
+
+    const applet = new GGBApplet(parameters, true);
+    applet.inject('ggbApplet');
+  }
+</script>
+</body>
+</html>

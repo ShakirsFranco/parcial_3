@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gráfico 3D de Cono</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+<div id="plot"></div>
+<script>
+  // Definir la función f(x) = x para generar un cono
+  function f(x) {
+    return x;
+  }
+
+  // Crear los datos para el gráfico
+  let x = [];
+  let y = [];
+  let z = [];
+
+  const a = 0;
+  const b = 1;
+  const n = 50;
+  const dx = (b - a) / n;
+
+  for (let i = 0; i <= n; i++) {
+    let xi = a + i * dx;
+    let yi = f(xi);
+    for (let theta = 0; theta <= 2 * Math.PI; theta += Math.PI / 20) {
+      x.push(xi);
+      y.push(yi * Math.cos(theta));
+      z.push(yi * Math.sin(theta));
+    }
+  }
+
+  let data = [{
+    type: 'surface',
+    x: [x],
+    y: [y],
+    z: [z],
+    showscale: false
+  }];
+
+  // Configurar el diseño del gráfico
+  let layout = {
+    title: 'Cono',
+    scene: {
+      xaxis: {title: 'x'},
+      yaxis: {title: 'y'},
+      zaxis: {title: 'z'}
+    }
+  };
+
+  // Renderizar el gráfico
+  Plotly.newPlot('plot', data, layout);
+</script>
+</body>
+</html>
