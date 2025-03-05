@@ -3,79 +3,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Integrales Disco de Revolución</title>
+  <title>Problemas de Integrales y Sólidos de Revolución</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 p-6">
-  <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
-    <h1 class="text-2xl font-bold mb-4">Integrales Disco de Revolución</h1>
-    <form id="diskForm" class="space-y-4">
-      <div>
-        <input type="text" id="func" placeholder="Ej: x" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-      </div>
-      <div>
-        <label for="a" class="block text-sm font-medium text-gray-700">Límite inferior (a):</label>
-        <input type="number" id="a" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-      </div>
-      <div>
-        <label for="b" class="block text-sm font-medium text-gray-700">Límite superior (b):</label>
-        <input type="number" id="b" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-      </div>
-      <div>
-        <label for="n" class="block text-sm font-medium text-gray-700">Número de subdivisiones (n):</label>
-        <input type="number" id="n" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-      </div>
-      <button type="button" onclick="calcularVolumen()" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Calcular</button>
-    </form>
-    <h2 class="text-xl font-semibold mt-6">Resultado: <span id="resultado" class="text-indigo-600"></span></h2>
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+  <h1 class="text-2xl font-bold mb-4">Problemas de Integrales y Sólidos de Revolución</h1>
+
+  <!-- Selección de problema -->
+  <div class="mb-4">
+    <label for="problemType" class="block text-sm font-medium text-gray-700">Selecciona el tipo de problema:</label>
+    <select id="problemType" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onchange="toggleProblemFields()">
+      <option value="1">Problema con una función</option>
+      <option value="2">Problema con dos funciones</option>
+    </select>
   </div>
-  <div id="plot"></div>
-  <script>
-    // Definir la función f(x) = x^2
-    function f(x) {
-      return Math.pow(x, 2);
-    }
 
-    // Crear los datos para el gráfico
-    let x = [];
-    let y = [];
-    let z = [];
+  <!-- Problema con una función -->
+  <div id="problem1Fields" class="space-y-4">
+    <h2 class="text-xl font-semibold mt-6">Problema con una función</h2>
+    <form id="problem1Form" class="space-y-4">
+      <div>
+        <label for="func1" class="block text-sm font-medium text-gray-700">Función:</label>
+        <input type="text" id="func1" placeholder="Ej: Math.sqrt(Math.sin(x))" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+      <div>
+        <label for="a1" class="block text-sm font-medium text-gray-700">Límite inferior (a):</label>
+        <input type="number" id="a1" value="0" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+      <div>
+        <label for="b1" class="block text-sm font-medium text-gray-700">Límite superior (b):</label>
+        <input type="number" id="b1" value="3.14159" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+      <button type="button" onclick="calcularVolumen1()" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Calcular</button>
+    </form>
+    <h3 class="text-lg font-semibold mt-4">Resultado: <span id="resultado1" class="text-indigo-600"></span></h3>
+    <div id="ggbApplet1" class="mt-4"></div>
+  </div>
 
-    const a = 0;
-    const b = 1;
-    const n = 5;
-    const dx = (b - a) / n;
+  <!-- Problema con dos funciones -->
+  <div id="problem2Fields" class="space-y-4 hidden">
+    <h2 class="text-xl font-semibold mt-6">Problema con dos funciones</h2>
+    <form id="problem2Form" class="space-y-4">
+      <div>
+        <label for="func21" class="block text-sm font-medium text-gray-700">Función 1:</label>
+        <input type="text" id="func21" placeholder="Ej: 6 - 2*x - x^2" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+      <div>
+        <label for="func22" class="block text-sm font-medium text-gray-700">Función 2:</label>
+        <input type="text" id="func22" placeholder="Ej: x + 6" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+      <button type="button" onclick="calcularAreaYVolumen2()" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Calcular</button>
+    </form>
+    <h3 class="text-lg font-semibold mt-4">Resultado: <span id="resultado2" class="text-indigo-600"></span></h3>
+    <div id="ggbApplet2" class="mt-4"></div>
+  </div>
+</div>
+<script src="https://www.geogebra.org/apps/deployggb.js"></script>
+<script>
+  function toggleProblemFields() {
+    const problemType = document.getElementById('problemType').value;
+    document.getElementById('problem1Fields').classList.toggle('hidden', problemType !== '1');
+    document.getElementById('problem2Fields').classList.toggle('hidden', problemType !== '2');
+  }
 
-    for (let i = 0; i <= n; i++) {
-      let xi = a + i * dx;
-      let yi = f(xi);
-      x.push(xi);
-      y.push(yi);
-      z.push(0); // z es 0 porque estamos en el plano xy
-    }
+  function calcularVolumen1() {
+    const funcStr = document.getElementById('func1').value;
+    const a = parseFloat(document.getElementById('a1').value);
+    const b = parseFloat(document.getElementById('b1').value);
 
-    // Crear los datos para el gráfico 3D
-    let data = [{
-      type: 'surface',
-      x: [x],
-      y: [y],
-      z: [z],
-      showscale: false
-    }];
+    const funcGeoGebra = funcStr.replace(/Math\.sqrt\(([^)]+)\)/g, "sqrt($1)");
 
-    // Configurar el diseño del gráfico
-    let layout = {
-      title: 'Sólido de Revolución',
-      scene: {
-        xaxis: {title: 'x'},
-        yaxis: {title: 'f(x)'},
-        zaxis: {title: 'z'}
+    const parameters = {
+      "appName": "3d",
+      "width": 725,
+      "height": 600,
+      "showToolBar": false,
+      "showAlgebraInput": false,
+      "showMenuBar": false,
+      "appletOnLoad": function(api) {
+        api.evalCommand(`f(x) = ${funcGeoGebra}`);
+        api.evalCommand(`Volume = pi * Integral(f(x)^2, ${a}, ${b})`);
+        const volume = api.getValue("Volume");
+        document.getElementById('resultado1').innerText = `Volumen del sólido de revolución: ${volume.toFixed(6)}`;
+        api.evalCommand(`Curve((x, f(x)), x, ${a}, ${b})`);
+        api.evalCommand(`Surface((x, f(x) * cos(t), f(x) * sin(t)), x, ${a}, ${b}, t, 0, 2 * pi)`);
       }
     };
 
-    // Renderizar el gráfico
-    Plotly.newPlot('plot', data, layout);
-  </script>
-  <script src="js/app.js"></script>
+    const applet = new GGBApplet(parameters, true);
+    applet.inject('ggbApplet1');
+  }
+
+  function calcularAreaYVolumen2() {
+    const funcStr1 = document.getElementById('func21').value;
+    const funcStr2 = document.getElementById('func22').value;
+
+    const funcGeoGebra1 = funcStr1.replace(/Math\.sqrt\(([^)]+)\)/g, "sqrt($1)");
+    const funcGeoGebra2 = funcStr2.replace(/Math\.sqrt\(([^)]+)\)/g, "sqrt($1)");
+
+    const parameters = {
+      "appName": "3d",
+      "width": 725,
+      "height": 600,
+      "showToolBar": false,
+      "showAlgebraInput": false,
+      "showMenuBar": false,
+      "appletOnLoad": function(api) {
+        api.evalCommand(`f1(x) = ${funcGeoGebra1}`);
+        api.evalCommand(`f2(x) = ${funcGeoGebra2}`);
+        api.evalCommand(`Intersect(f1, f2)`);
+        const intersectionPoints = api.getAllObjectNames("Point");
+        const a = api.getValue(intersectionPoints[0] + ".x");
+        const b = api.getValue(intersectionPoints[1] + ".x");
+
+        api.evalCommand(`Area = Integral(f1(x) - f2(x), ${a}, ${b})`);
+        const area = api.getValue("Area");
+        document.getElementById('resultado2').innerText = `Área de la región acotada: ${area.toFixed(6)}`;
+
+        api.evalCommand(`Volume = pi * Integral((f1(x) - f2(x))^2, ${a}, ${b})`);
+        const volume = api.getValue("Volume");
+        document.getElementById('resultado2').innerText += `\nVolumen del sólido de revolución: ${volume.toFixed(4)}`;
+
+        api.evalCommand(`Curve((x, f1(x)), x, ${a}, ${b})`);
+        api.evalCommand(`Curve((x, f2(x)), x, ${a}, ${b})`);
+        api.evalCommand(`Surface((x, f1(x) * cos(t), f1(x) * sin(t)), x, ${a}, ${b}, t, 0, 2 * pi)`);
+        api.evalCommand(`Surface((x, f2(x) * cos(t), f2(x) * sin(t)), x, ${a}, ${b}, t, 0, 2 * pi)`);
+      }
+    };
+
+    const applet = new GGBApplet(parameters, true);
+    applet.inject('ggbApplet2');
+  }
+</script>
 </body>
 </html>
+
