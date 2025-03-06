@@ -1,11 +1,11 @@
-function calcularTrapecioManual(a, b, n, func, xValues) {
-  const f = new Function('x', `return ${func}`);
+function calcularTrapecioManual(a, b, n, expr, xValues) {
+  const f = math.compile(expr);
   let sum = 0;
   let resultados = [];
 
   for (let i = 0; i < xValues.length; i++) {
     const x = xValues[i];
-    const fx = f(x);
+    const fx = f.evaluate({ x });
     const peso_fx = (i === 0 || i === xValues.length - 1) ? fx : 2 * fx;
     sum += peso_fx;
     resultados.push({ i, x, fx, peso_fx });
@@ -16,18 +16,18 @@ function calcularTrapecioManual(a, b, n, func, xValues) {
   return { integral, resultados, h };
 }
 
-function calcularSimpsonManual(a, b, n, func, xValues) {
+function calcularSimpsonManual(a, b, n, expr, xValues) {
   if (n % 2 !== 0) {
     throw new Error("El número de intervalos (n) debe ser par para el método de Simpson.");
   }
 
-  const f = new Function('x', `return ${func}`);
+  const f = math.compile(expr);
   let sum = 0;
   let resultados = [];
 
   for (let i = 0; i < xValues.length; i++) {
     const x = xValues[i];
-    const fx = f(x);
+    const fx = f.evaluate({ x });
     let peso_fx;
     if (i === 0 || i === xValues.length - 1) {
       peso_fx = fx;
@@ -49,7 +49,7 @@ function calcularManual() {
   let a = document.getElementById('a').value;
   let b = document.getElementById('b').value;
   const n = parseInt(document.getElementById('n').value);
-  const func = document.getElementById('func').value;
+  const expr = document.getElementById('func').value;
   const method = document.getElementById('method').value;
   const xValues = document.getElementById('xValues').value.split(',').map(Number);
 
@@ -62,9 +62,9 @@ function calcularManual() {
 
   let result;
   if (method === 'trapecio') {
-    result = calcularTrapecioManual(a, b, n, func, xValues);
+    result = calcularTrapecioManual(a, b, n, expr, xValues);
   } else if (method === 'simpson') {
-    result = calcularSimpsonManual(a, b, n, func, xValues);
+    result = calcularSimpsonManual(a, b, n, expr, xValues);
   }
 
   document.getElementById('resultado').innerText = result.integral.toFixed(6);
