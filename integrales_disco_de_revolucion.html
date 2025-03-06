@@ -6,6 +6,7 @@
   <title>Problema con Dos Funciones</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://www.geogebra.org/apps/deployggb.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.0.0/math.min.js"></script>
 </head>
 <body class="bg-gray-100 p-6">
 <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
@@ -16,15 +17,15 @@
     <div>
       <label for="func21" class="block text-sm font-medium text-gray-700">Función 1:</label>
       <input type="text" id="func21" placeholder="Ej: 6 - 2*x - x^2" required
-        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
     </div>
     <div>
       <label for="func22" class="block text-sm font-medium text-gray-700">Función 2:</label>
       <input type="text" id="func22" placeholder="Ej: x + 6" required
-        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
     </div>
     <button type="button" onclick="calcularAreaYVolumen2()"
-      class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
       Calcular
     </button>
   </form>
@@ -36,60 +37,85 @@
 
 <script>
   function calcularAreaYVolumen2() {
-  const funcStr1 = document.getElementById('func21').value;
-  const funcStr2 = document.getElementById('func22').value;
+    const funcStr1 = document.getElementById('func21').value;
+    const funcStr2 = document.getElementById('func22').value;
 
-  const puntosX = [0, -3]; // Soluciones de la ecuación
-  const lowerLimit = Math.min(...puntosX);
-  const upperLimit = Math.max(...puntosX);
+    // Definir las funciones
+    const f1 = math.compile(funcStr1);
+    const f2 = math.compile(funcStr2);
 
-  console.log("Límites de integración calculados algebraicamente:");
-  console.log(`Límite inferior (a): ${lowerLimit}`);
-  console.log(`Límite superior (b): ${upperLimit}`);
-
-  // Configurar el applet de GeoGebra
-  const parameters = {
-    "appName": "3d",
-    "width": 725,
-    "height": 600,
-    "showToolBar": false,
-    "showAlgebraInput": false,
-    "showMenuBar": false,
-    "appletOnLoad": function(api) {
-      api.evalCommand(`f1(x) = ${funcStr1}`);
-      api.evalCommand(`f2(x) = ${funcStr2}`);
-
-      // Calcular el área entre las dos funciones
-      api.evalCommand(`Area = Integral(f1(x) - f2(x), ${lowerLimit}, ${upperLimit})`);
-      const area = api.getValue("Area");
-
-      console.log("Área entre las funciones:");
-      console.log(`Área = ${area}`);
-
-      // Calcular el volumen del sólido de revolución
-      api.evalCommand(`Volume = pi * Integral((f1(x) - f2(x))^2, ${lowerLimit}, ${upperLimit})`);
-      const volume = api.getValue("Volume");
-
-      console.log("Volumen del sólido de revolución:");
-      console.log(`Volumen = ${volume}`);
-
-      // Mostrar resultados en la página
-      document.getElementById('resultado2').innerText = `Área de la región acotada: ${area.toFixed(6)}\nVolumen del sólido de revolución: ${volume.toFixed(4)}`;
-
-      // Graficar las funciones y el sólido de revolución
-      api.evalCommand(`Curve((x, f1(x)), x, ${lowerLimit}, ${upperLimit})`);
-      api.evalCommand(`Curve((x, f2(x)), x, ${lowerLimit}, ${upperLimit})`);
-      api.evalCommand(`Surface((x, f1(x) * cos(t), f1(x) * sin(t)), x, ${lowerLimit}, ${upperLimit}, t, 0, 2 * pi)`);
-      api.evalCommand(`Surface((x, f2(x) * cos(t), f2(x) * sin(t)), x, ${lowerLimit}, ${upperLimit}, t, 0, 2 * pi)`);
+    // Encontrar los puntos de intersección usando un método numérico
+    function findIntersection(f1, f2, x0, x1, tol = 1e-7) {
+      let x = x0;
+      while (Math.abs(f1.evaluate({x}) - f2.evaluate({x})) > tol) {
+        x = (x0 + x1) / 2;
+        if ((f1.evaluate({x: x0}) - f2.evaluate({x: x0})) * (f1.evaluate({x}) - f2.evaluate({x})) < 0) {
+          x1 = x;
+        } else {
+          x0 = x;
+        }
+      }
+      return x;
     }
-  };
 
-  const applet = new GGBApplet(parameters, true);
-  applet.inject('ggbApplet2');
-}
+    const x1 = findIntersection(f1, f2, -4, -2);
+    const x2 = findIntersection(f1, f2, -1, 1);
+    const puntosX = [x1, x2];
+
+    const lowerLimit = Math.min(...puntosX);
+    const upperLimit = Math.max(...puntosX);
+
+    console.log("Límites de integración calculados algebraicamente:");
+    console.log(`Límite inferior (a): ${lowerLimit}`);
+    console.log(`Límite superior (b): ${upperLimit}`);
+
+    // Configurar el applet de GeoGebra
+    const parameters = {
+      "appName": "3d",
+      "width": 725,
+      "height": 600,
+      "showToolBar": false,
+      "showAlgebraInput": false,
+      "showMenuBar": false,
+      "appletOnLoad": function(api) {
+        api.evalCommand(`f1(x) = ${funcStr1}`);
+        api.evalCommand(`f2(x) = ${funcStr2}`);
+
+        // Calcular el área entre las dos funciones
+        api.evalCommand(`Area = Integral(f1(x) - f2(x), ${lowerLimit}, ${upperLimit})`);
+        const area = api.getValue("Area");
+
+        console.log("Área entre las funciones:");
+        console.log(`Área = ${area}`);
+
+        // Calcular el volumen del sólido de revolución
+        api.evalCommand(`Volume = pi * Integral((f1(x) - f2(x))^2, ${lowerLimit}, ${upperLimit})`);
+        const volume = api.getValue("Volume");
+
+        console.log("Volumen del sólido de revolución:");
+        console.log(`Volumen = ${volume}`);
+
+        // Mostrar resultados en la página
+        document.getElementById('resultado2').innerText = `Área de la región acotada: ${area.toFixed(6)}\nVolumen del sólido de revolución: ${volume.toFixed(4)}`;
+
+        // Graficar las funciones y el sólido de revolución
+        api.evalCommand(`Curve((x, f1(x)), x, ${lowerLimit}, ${upperLimit})`);
+        api.evalCommand(`Curve((x, f2(x)), x, ${lowerLimit}, ${upperLimit})`);
+        api.evalCommand(`Surface((x, f1(x) * cos(t), f1(x) * sin(t)), x, ${lowerLimit}, ${upperLimit}, t, 0, 2 * pi)`);
+        api.evalCommand(`Surface((x, f2(x) * cos(t), f2(x) * sin(t)), x, ${lowerLimit}, ${upperLimit}, t, 0, 2 * pi)`);
+      }
+    };
+
+    const applet = new GGBApplet(parameters, true);
+    applet.inject('ggbApplet2');
+  }
 </script>
 </body>
 </html>
+
+
+
+
 
 
 

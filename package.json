@@ -22,6 +22,7 @@
     "webpack-merge": "^5.10.0"
   },
   "dependencies": {
+    "nerdamer": "^1.1.13",
     "plotly.js-dist": "^3.0.1"
   }
 }
