@@ -1,3 +1,11 @@
+function calcularErrorRelativo(valorManual, valorCalculado) {
+  if (valorManual === 0) {
+    throw new Error("El valor manual no puede ser cero.");
+  }
+  const errorRelativo = Math.abs((valorManual - valorCalculado) / valorManual);
+  return errorRelativo;
+}
+
 function calcularTrapecio(a, b, n, func) {
   const h = (b - a) / n;
   const f = new Function('x', `return ${func}`);
@@ -50,6 +58,7 @@ function calcular() {
   const n = parseInt(document.getElementById('n').value);
   const func = document.getElementById('func').value;
   const method = document.getElementById('method').value;
+  const manualResult = parseFloat(document.getElementById('manualResult').value);
 
   // Replace 'PI' with Math.PI
   a = a.replace(/PI/g, Math.PI);
@@ -65,7 +74,12 @@ function calcular() {
     result = calcularSimpson(a, b, n, func);
   }
 
-  document.getElementById('resultado').innerText = result.integral.toFixed(6);
+  const valorCalculado = result.integral;
+  document.getElementById('resultado').innerText = valorCalculado.toFixed(6);
+
+  // Calcular y mostrar el error relativo
+  const errorRelativo = calcularErrorRelativo(manualResult, valorCalculado);
+  document.getElementById('error_relativo').innerText = errorRelativo.toFixed(6);
 
   // Mostrar datos de entrada
   document.getElementById('datos').innerHTML = `
