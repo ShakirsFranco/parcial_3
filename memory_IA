@@ -1,0 +1,57 @@
+import requests
+import json
+import os
+
+OLLAMA_URL = "http://localhost:11434/api/chat"  # Cambia si tu endpoint Ollama es diferente
+MODEL = "mannix/deepseek-coder-v2-lite-instruct:latest"
+MEMORY_FILE = "memory.json"
+
+def load_memory():
+    if os.path.exists(MEMORY_FILE):
+        with open(MEMORY_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
+def save_memory(memory):
+    with open(MEMORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(memory, f, ensure_ascii=False, indent=2)
+
+def chat_with_model(message, memory):
+    payload = {
+        "model": MODEL,
+        "messages": memory + [{"role": "user", "content": message}]
+    }
+    response = requests.post(OLLAMA_URL, json=payload)
+    response.raise_for_status()
+    # Concatenar todos los fragmentos de 'content' de cada línea JSON
+    contents = []
+    for line in response.text.strip().splitlines():
+        try:
+            data = json.loads(line)
+            contents.append(data.get("message", {}).get("content", ""))
+        except Exception:
+            continue
+    full_response = "".join(contents).strip()
+    if not full_response:
+        raise ValueError("No se pudo extraer la respuesta del modelo.")
+    return full_response
+
+def main():
+    memory = load_memory()
+    print("Escribe 'salir' para terminar.")
+    while True:
+        user_input = input("Tú: ")
+        if user_input.lower() == "salir":
+            break
+        memory.append({"role": "user", "content": user_input})
+        try:
+            response = chat_with_model(user_input, memory)
+            print(f"Modelo: {response}")
+            memory.append({"role": "assistant", "content": response})
+            save_memory(memory)
+        except Exception as e:
+            print(f"Error al conectar con Ollama: {e}")
+            break
+
+if __name__ == "__main__":
+    main()
