@@ -10,3 +10,5 @@ module.exports = {
     filename: './js/app.js',
   },
 };
+
+https://docbox.etsi.org/Workshop/2023/11_UCAAT/TUTORIALS/Tutorial_Sharma_automation%20using%20karate.pdf
